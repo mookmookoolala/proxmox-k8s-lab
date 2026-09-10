@@ -1,0 +1,41 @@
+proxmox_endpoint = "https://192.168.1.10:8006/"
+proxmox_insecure = true
+node_name        = "pve"
+template_vm_id   = 9000
+datastore_id     = "local-lvm"
+network_bridge   = "vmbr0"
+gateway          = "192.168.1.1"
+dns_servers      = ["1.1.1.1", "9.9.9.9"]
+
+ssh_username = "ubuntu"
+ssh_public_keys = [
+  "ssh-ed25519 AAAA_REPLACE_WITH_YOUR_PUBLIC_KEY you@example"
+]
+
+cluster_nodes = {
+  k8s-control = {
+    vm_id        = 200
+    role         = "control-plane"
+    address      = "192.168.1.74/24"
+    cpu_cores    = 2
+    memory_mb    = 2560
+    disk_size_gb = 30
+  }
+  k8s-worker-1 = {
+    vm_id        = 201
+    role         = "worker"
+    address      = "192.168.1.75/24"
+    cpu_cores    = 2
+    memory_mb    = 3584
+    disk_size_gb = 70
+  }
+  k8s-worker-2 = {
+    vm_id        = 202
+    role         = "worker"
+    address      = "192.168.1.76/24"
+    cpu_cores    = 2
+    memory_mb    = 3584
+    disk_size_gb = 70
+  }
+}
+
