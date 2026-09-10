@@ -7,7 +7,7 @@ network_bridge   = "vmbr0"
 gateway          = "192.168.1.1"
 dns_servers      = ["1.1.1.1", "9.9.9.9"]
 
-ssh_username = "ubuntu"
+ssh_username = "rhel"
 ssh_public_keys = [
   "ssh-ed25519 AAAA_REPLACE_WITH_YOUR_PUBLIC_KEY you@example"
 ]
@@ -38,4 +38,3 @@ cluster_nodes = {
     disk_size_gb = 70
   }
 }
-

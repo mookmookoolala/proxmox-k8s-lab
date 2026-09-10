@@ -1,6 +1,6 @@
 # Proxmox Kubernetes Lab with Terraform/OpenTofu
 
-A reusable infrastructure-as-code starter that clones an Ubuntu cloud-init
+A reusable infrastructure-as-code starter that clones a RHEL 9 cloud-init
 template into a small upstream Kubernetes learning cluster on Proxmox VE.
 
 The code provisions virtual machines only. Kubernetes installation is kept as a
@@ -16,7 +16,8 @@ are controlled entirely by the `cluster_nodes` map.
 
 - Proxmox VE with a working bridge and enough free VM storage
 - OpenTofu 1.6+ or Terraform 1.6+
-- An Ubuntu cloud-init VM template with `qemu-guest-agent` installed
+- A RHEL 9 cloud-init VM template with `cloud-init` and `qemu-guest-agent`
+  installed and enabled
 - A least-privilege Proxmox API token
 - An SSH public key
 - IP addresses reserved outside the DHCP pool
@@ -43,10 +44,30 @@ it. Never run an unreviewed destroy plan against a Proxmox host containing data.
 
 ## Template requirements
 
-Create the Ubuntu template once using the Proxmox UI or your own audited image
-pipeline. It should use a cloud image, SCSI disk/controller, VirtIO networking,
-a cloud-init drive, serial console, and QEMU guest agent. Set its VM ID in
+Create the RHEL 9 template once using the Proxmox UI or your own audited image
+pipeline. Start from an official RHEL generic cloud image. The guest should have
+`cloud-init`, `qemu-guest-agent`, and `sshd` installed and enabled. Configure a
+SCSI disk/controller, VirtIO networking, a cloud-init drive, and a serial
+console before converting the VM into a template. Set its VM ID in
 `template_vm_id`.
+
+The example creates the `rhel` cloud-init user and authorizes an SSH public key.
+No console password is configured by default. Connect using SSH after the VM has
+booted:
+
+```bash
+ssh -i ~/.ssh/id_ed25519 rhel@192.168.68.74
+```
+
+Before turning a prepared guest into a reusable template, enable its services
+and clean the per-instance cloud-init state:
+
+```bash
+sudo dnf install -y cloud-init qemu-guest-agent
+sudo systemctl enable cloud-init qemu-guest-agent sshd
+sudo cloud-init clean --logs --machine-id
+sudo poweroff
+```
 
 ## Authentication
 
@@ -68,4 +89,3 @@ configuration management.
 - Back up existing guests before importing, replacing, or destroying anything.
 - Do not reuse VM IDs already present on the Proxmox node.
 - Start with `plan`; creation and deletion only occur after an explicit `apply`.
-
