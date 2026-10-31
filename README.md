@@ -1,11 +1,12 @@
 # Proxmox Kubernetes Lab with Terraform/OpenTofu
 
-A reusable infrastructure-as-code starter that clones a RHEL 9 cloud-init
+A reusable infrastructure-as-code starter that clones a Debian cloud-init
 template into a small upstream Kubernetes learning cluster on Proxmox VE.
 
-The code provisions virtual machines only. Kubernetes installation is kept as a
-separate step so users can learn `containerd`, `kubeadm`, CNI installation, and
-node joining rather than hiding those operations inside Terraform provisioners.
+Terraform provisions the virtual machines. The public-safe scripts in
+[`kubernetes/`](kubernetes/) then prepare the guests and initialize the cluster
+with `containerd` and `kubeadm`. Cluster credentials and join tokens are created
+at runtime and are never stored in this repository.
 
 ## What it creates
 
@@ -16,7 +17,8 @@ are controlled entirely by the `cluster_nodes` map.
 
 - Proxmox VE with a working bridge and enough free VM storage
 - OpenTofu 1.6+ or Terraform 1.6+
-- A RHEL 9 cloud-init VM template with `cloud-init` and `qemu-guest-agent`
+- A Debian 12 or 13 cloud-init VM template with `cloud-init` and
+  `qemu-guest-agent`
   installed and enabled
 - A least-privilege Proxmox API token
 - An SSH public key
@@ -44,26 +46,27 @@ it. Never run an unreviewed destroy plan against a Proxmox host containing data.
 
 ## Template requirements
 
-Create the RHEL 9 template once using the Proxmox UI or your own audited image
-pipeline. Start from an official RHEL generic cloud image. The guest should have
+Create the Debian template once using the Proxmox UI or your own audited image
+pipeline. Start from an official Debian generic cloud image. The guest should have
 `cloud-init`, `qemu-guest-agent`, and `sshd` installed and enabled. Configure a
 SCSI disk/controller, VirtIO networking, a cloud-init drive, and a serial
 console before converting the VM into a template. Set its VM ID in
 `template_vm_id`.
 
-The example creates the `rhel` cloud-init user and authorizes an SSH public key.
+The example creates the `debian` cloud-init user and authorizes an SSH public key.
 No console password is configured by default. Connect using SSH after the VM has
 booted:
 
 ```bash
-ssh -i ~/.ssh/id_ed25519 rhel@192.168.68.74
+ssh -i ~/.ssh/id_ed25519 debian@192.168.68.74
 ```
 
 Before turning a prepared guest into a reusable template, enable its services
 and clean the per-instance cloud-init state:
 
 ```bash
-sudo dnf install -y cloud-init qemu-guest-agent
+sudo apt-get update
+sudo apt-get install -y cloud-init qemu-guest-agent
 sudo systemctl enable cloud-init qemu-guest-agent sshd
 sudo cloud-init clean --logs --machine-id
 sudo poweroff
@@ -76,11 +79,18 @@ scoped to the target pool/datastore with only the privileges needed to clone and
 configure VMs. `proxmox_insecure = true` is provided for home labs using the
 default self-signed certificate; a trusted certificate is preferable.
 
-## Next stage
+## Kubernetes setup
 
-After provisioning, install upstream Kubernetes with `kubeadm` or feed the
-output addresses to an Ansible role. This repository intentionally stops before
-configuration management.
+After Terraform finishes, follow [`kubernetes/README.md`](kubernetes/README.md).
+The setup deliberately leaves CNI selection to the operator because its release
+and Pod CIDR must be chosen together. Do not commit `admin.conf`, a kubeconfig,
+bootstrap tokens, certificate keys, or generated join commands.
+
+## GitOps
+
+After the cluster and CNI are ready, follow [`gitops/README.md`](gitops/README.md)
+to install or connect Argo CD to this public repository. The source is read-only
+over HTTPS, so Argo CD does not need a GitHub token or deploy key.
 
 ## Safety
 

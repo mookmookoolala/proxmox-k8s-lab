@@ -4,6 +4,13 @@
 *.tfplan
 terraform.tfvars
 .env
+kubeconfig*
+admin.conf
+join-command*.sh
+*.agekey
+*.dec.yaml
+*.decrypted.yaml
+.sops-key*
 crash.log
 override.tf
 override.tf.json

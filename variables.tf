@@ -23,7 +23,7 @@ variable "node_name" {
 }
 
 variable "template_vm_id" {
-  description = "VM ID of a RHEL 9 cloud-init template with cloud-init and qemu-guest-agent installed."
+  description = "VM ID of a Debian cloud-init template with cloud-init and qemu-guest-agent installed."
   type        = number
 }
 
@@ -53,7 +53,7 @@ variable "dns_servers" {
 variable "ssh_username" {
   description = "Linux account created by cloud-init."
   type        = string
-  default     = "rhel"
+  default     = "debian"
 }
 
 variable "ssh_public_keys" {

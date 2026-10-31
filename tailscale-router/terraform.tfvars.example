@@ -1,0 +1,21 @@
+proxmox_endpoint = "https://192.168.68.71:8006/"
+proxmox_insecure = true
+node_name        = "moo"
+
+container_id         = 110
+hostname             = "tailscale-router"
+datastore_id         = "local-lvm"
+template_datastore_id = "local"
+network_bridge       = "vmbr0"
+
+# Start with DHCP. Reserve the assigned address in the router before switching
+# this value to a static CIDR.
+ipv4_address = "dhcp"
+ipv4_gateway = null
+
+dns_servers = ["1.1.1.1", "9.9.9.9"]
+
+ssh_public_keys = [
+  "ssh-ed25519 AAAA_REPLACE_WITH_YOUR_PUBLIC_KEY you@example.com"
+]
+
