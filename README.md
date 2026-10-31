@@ -1,4 +1,4 @@
-# Proxmox Kubernetes Lab with Terraform/OpenTofu
+# Proxmox Kubernetes Lab with Terraform
 
 A reusable infrastructure-as-code starter that clones a Debian cloud-init
 template into a small upstream Kubernetes learning cluster on Proxmox VE.
@@ -16,7 +16,7 @@ are controlled entirely by the `cluster_nodes` map.
 ## Prerequisites
 
 - Proxmox VE with a working bridge and enough free VM storage
-- OpenTofu 1.6+ or Terraform 1.6+
+- Terraform 1.6+
 - A Debian 12 or 13 cloud-init VM template with `cloud-init` and
   `qemu-guest-agent`
   installed and enabled
@@ -34,15 +34,15 @@ cp terraform.tfvars.example terraform.tfvars
 
 export PROXMOX_VE_API_TOKEN='terraform@pve!provider=replace-with-secret'
 
-tofu init
-tofu fmt -check
-tofu validate
-tofu plan -out=tfplan
-tofu apply tfplan
+terraform init
+terraform fmt -check
+terraform validate
+terraform plan -out=tfplan
+terraform apply tfplan
 ```
 
-Use `terraform` instead of `tofu` if preferred. Review every plan before applying
-it. Never run an unreviewed destroy plan against a Proxmox host containing data.
+Review every plan before applying it. Never run an unreviewed destroy plan
+against a Proxmox host containing data.
 
 ## Template requirements
 
